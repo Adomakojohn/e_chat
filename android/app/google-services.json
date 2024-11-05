@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "633812235853",
+    "project_id": "idea-chat-app-8fe6a",
+    "storage_bucket": "idea-chat-app-8fe6a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:633812235853:android:f0eb004afb35e303de4e04",
+        "android_client_info": {
+          "package_name": "com.example.chat_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyClFPKzhc55yhSGDMNyJlMInBfvD1K0LFU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
