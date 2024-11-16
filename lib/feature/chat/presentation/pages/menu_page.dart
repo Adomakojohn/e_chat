@@ -17,7 +17,7 @@ class _MenuPageState extends State<MenuPage> {
         tileName: 'Language',
         trail: Icon(Icons.arrow_forward_ios_outlined),
       ),
-      'route': '/language', // specify the route for navigation
+      'route': '/language',
     },
     {
       'tile': const SettingsTile(
@@ -107,12 +107,6 @@ class _MenuPageState extends State<MenuPage> {
                   fontWeight: FontWeight.w500),
             ),
           ],
-        ),
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pushReplacementNamed(context, 'loginpage');
-          },
-          icon: const Icon(Icons.logout_rounded),
         ),
       ),
       body: Column(

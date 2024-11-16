@@ -15,7 +15,7 @@ class _BottomNavBarPageState extends State<BottomNavBarPage> {
   int _selectedIndex = 0;
 
   final List<Widget> _widgetOptions = <Widget>[
-    HomePage(),
+    const HomePage(),
     const GroupsPage(),
     const ProfilePage(),
     const MenuPage()

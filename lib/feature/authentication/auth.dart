@@ -1,5 +1,5 @@
 import 'package:chat_app/feature/authentication/login_page.dart';
-import 'package:chat_app/feature/chat/presentation/pages/homepage.dart';
+import 'package:chat_app/feature/chat/presentation/pages/bottom_nav_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -22,7 +22,7 @@ class _MyAuthState extends State<MyAuth> {
           }
 
           if (snapshot.hasData) {
-            return HomePage(); // User is logged in
+            return const BottomNavBarPage();
           } else {
             return const LoginPage(); // User is logged out
           }

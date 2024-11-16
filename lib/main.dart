@@ -1,7 +1,6 @@
 import 'package:chat_app/core/utils/theme/theme.dart';
 import 'package:chat_app/feature/authentication/auth.dart';
 import 'package:chat_app/feature/authentication/sign_up_page.dart';
-import 'package:chat_app/feature/chat/presentation/pages/bottom_nav_bar.dart';
 import 'package:chat_app/feature/chat/presentation/pages/homepage.dart';
 import 'package:chat_app/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -25,12 +24,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: const BottomNavBarPage(),
+      home: const MyAuth(),
       theme: CAppTheme.lightTheme,
       darkTheme: CAppTheme.darkTheme,
       themeMode: ThemeMode.system,
       routes: {
-        'homepage': (context) => HomePage(),
+        'homepage': (context) => const HomePage(),
         'loginpage': (context) => const LoginPage(),
         'signuppage': (context) => const SignUpPage(),
         'myauthpage': (context) => const MyAuth(),

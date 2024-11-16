@@ -1,92 +1,146 @@
+import 'package:chat_app/core/utils/widgets/user_message_tile.dart';
 import 'package:chat_app/feature/authentication/auth_service.dart';
 import 'package:chat_app/feature/chat/data/chat_services.dart';
 import 'package:chat_app/feature/chat/presentation/pages/chat_page.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:chat_app/feature/chat/presentation/pages/search_user_page.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../core/utils/widgets/user_message_tile.dart';
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
-class HomePage extends StatelessWidget {
-  HomePage({super.key});
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
 
+class _HomePageState extends State<HomePage> {
   final ChatServices chatService = ChatServices();
   final AuthServices authServices = AuthServices();
-
-  final bool isLoading = false;
+  bool isSearch = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.blue.shade800,
-        title: const Row(
-          children: [
-            ImageIcon(
-              AssetImage(
-                'assets/logos/Logo.png',
+        title: isSearch
+            ? const SizedBox(
+                width: 500,
+                child: TextField(),
+              )
+            : Row(
+                children: [
+                  const ImageIcon(
+                    AssetImage('assets/logos/Logo.png'),
+                    size: 60,
+                    color: Colors.white,
+                  ),
+                  const Text(
+                    'E-chat',
+                    style: TextStyle(
+                        fontSize: 21,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500),
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const SearchUserPage(),
+                        ),
+                      );
+                    },
+                    icon: const Icon(
+                      Icons.search,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
               ),
-              size: 60,
-              color: Colors.white,
-            ),
-            Text(
-              'E-chat',
-              style: TextStyle(
-                  fontSize: 21,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w500),
-            ),
-          ],
-        ),
-        leading: IconButton(
-          onPressed: () async {
-            await FirebaseAuth.instance.signOut();
-            Navigator.pushReplacementNamed(context, 'loginpage');
-          },
-          icon: const Icon(Icons.logout_rounded),
-        ),
       ),
-      body: _buildUserList(),
-    );
-  }
+      body: FutureBuilder<String?>(
+        future: authServices.getCurrentUserId(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-  Widget _buildUserList() {
-    return StreamBuilder(
-      stream: chatService.getUsersStream(),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return const Text("error...");
-        }
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Text("Loading...");
-        }
-        return ListView(
-          children: snapshot.data!
-              .map<Widget>((userData) => _buildUserListItem(userData, context))
-              .toList(),
-        );
-      },
-    );
-  }
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
 
-  Widget _buildUserListItem(
-      Map<String, dynamic> userData, BuildContext context) {
-    if (userData["email"] != authServices.getCurrentUser()!.email) {
-      return UserMessageTile(
-        subtitleText: 'hello',
-        text: userData["email"],
-        onTap: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ChatPage(
-                  recieverEmail: userData['email'],
-                  receiverID: userData['uid'],
-                ),
-              ));
+          if (!snapshot.hasData) {
+            return const Center(child: Text('No current user found.'));
+          }
+
+          String currentUserId = snapshot.data!;
+
+          // StreamBuilder to fetch recent chats sorted by last message timestamp
+          return StreamBuilder<List<Map<String, dynamic>>>(
+            stream: chatService.getRecentChats(currentUserId),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}'));
+              }
+
+              if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                return const Center(
+                    child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('No chats yet.'),
+                    Text("Text other users by searching for their emails !"),
+                  ],
+                ));
+              }
+
+              List<Map<String, dynamic>> recentChats = snapshot.data!;
+
+              return ListView.builder(
+                itemCount: recentChats.length,
+                itemBuilder: (context, index) {
+                  final chat = recentChats[index];
+                  final memberEmails =
+                      chat['membersEmails'] as List<Map<String, String>>;
+
+                  final otherUser =
+                      memberEmails.isNotEmpty ? memberEmails.first : null;
+                  final otherUserEmail = otherUser != null
+                      ? otherUser['email'] ?? 'Unknown User'
+                      : 'Unknown User';
+                  final lastMessage = chat['lastMessage'] ?? 'No messages yet';
+                  final lastMessageTime = chat['lastMessageTime'];
+
+                  return UserMessageTile(
+                    trailing: const Text(''),
+                    text: otherUserEmail,
+                    subtitleText: lastMessage,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ChatPage(
+                            receiverID:
+                                otherUser != null ? otherUser['uid']! : '',
+                            recieverEmail: otherUserEmail,
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+              );
+            },
+          );
         },
-      );
-    } else {
-      return const SizedBox();
-    }
+      ),
+    );
   }
 }
