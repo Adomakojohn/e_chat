@@ -110,6 +110,7 @@ class _HomePageState extends State<HomePage> {
                   final memberEmails =
                       chat['membersEmails'] as List<Map<String, String>>;
 
+                  // Get the first member email from the list
                   final otherUser =
                       memberEmails.isNotEmpty ? memberEmails.first : null;
                   final otherUserEmail = otherUser != null
@@ -120,8 +121,8 @@ class _HomePageState extends State<HomePage> {
 
                   return UserMessageTile(
                     trailing: const Text(''),
-                    text: otherUserEmail,
-                    subtitleText: lastMessage,
+                    text: otherUserEmail, // Display the other user's email here
+                    subtitleText: lastMessage, // Display last message here
                     onTap: () {
                       Navigator.push(
                         context,

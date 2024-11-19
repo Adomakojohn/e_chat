@@ -63,7 +63,8 @@ class AuthServices {
 
   Future<String?> getCurrentUserId() async {
     User? user = _auth.currentUser;
-    return user?.uid;
+    return user
+        ?.uid; // Returns the UID of the current user or null if not logged in
   }
 
   // Initialize push notifications

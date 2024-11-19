@@ -14,7 +14,7 @@ class ChatServices {
         .where('members', arrayContains: currentUserId)
         .get();
 
-    Set<String> userIds = {}; // Use a set to avoid duplicates
+    Set<String> userIds = {};
 
     // Loop through the chat rooms and collect other user IDs
     for (var doc in chatRoomsSnapshot.docs) {
@@ -34,8 +34,7 @@ class ChatServices {
           await _firestore.collection('Users').doc(userId).get();
 
       if (userSnapshot.exists) {
-        String email =
-            userSnapshot['email'] ?? 'Unknown Use'; // Handle missing email
+        String email = userSnapshot['email'] ?? 'Unknown Use';
 
         // Add the user to the list of users texted
         usersTexted.add({
